@@ -167,15 +167,11 @@ function checkout() {
      // Get the total cost from the DOM
    // let totalCost = parseFloat(document.getElementById('total').innerText);   // this was used before making variable totalCost Global
 
-    // Prompt the user to pay the total amount
-    let payment = prompt(`Please pay $${totalCost.toFixed(2)}`);  // Directly use totalCost
     
-    
+    let payment = prompt(`Please pay $${totalCost.toFixed(2)}`);  // prompt the user to pay the total amount (directly use totalCost)
     while (parseFloat(payment).toFixed(2) !== totalCost.toFixed(2)) {
-        // If payment doesn't match, show an error and ask again
-        alert("Incorrect payment. Please enter the correct amount.");
+        alert("Incorrect payment. Please enter the correct amount.");  // if payment doesn't match, show an error and ask again
         payment = prompt(`Please pay $${totalCost.toFixed(2)}`);
-        
     }
     
     alert(`Thank you for your purchase, ${loggedInUser && loggedInUser.username ? loggedInUser.username : 'Human'}!`);
