@@ -1,5 +1,5 @@
 // User data
-const user = { username: 'steve', password: 'p123' };
+// moving to serve: const user = { username: 'bryan', password: 'password123' };
 
 // Cart data
 const cart = [];
@@ -7,29 +7,8 @@ const cart = [];
 // Store logged in user
 let loggedInUser = null;
 
-//making it global
-let totalCost = 0;
 
-// Function to handle login
-function handleLogin(event) {
-    event.preventDefault(); // Prevent page reload
-    
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
-    
-    const user = users.find(user => user.username === username && user.password === password);
-    
-    if (user) {
-        loggedInUser = user;
-        document.getElementById('welcome-message').textContent = `Welcome, ${user.username}!`;
-        alert('Login successful');
-    } else {
-        alert('Invalid username or password');
-    }
-}
-
-
-function handleLogin2(event){
+async function handleLogin2(event){
     event.preventDefault()
     const usernameElement = document.getElementById('username');
     console.log('usernameElement', usernameElement)
@@ -41,7 +20,20 @@ function handleLogin2(event){
     console.log('password', password)
 
 
-    console.log('user.username', user.username)
+   // not needed anymore:  console.log('user.username', user.username)
+
+
+    const response = await fetch('http://localhost:3000/login',
+    {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json' //tell the server...
+    },
+    body: JSON.stringify({
+        username: username,
+        password: password
+        })
+    })
 
     if(user.username !== username || user.password !== password){
         alert(` is not found`)
@@ -57,12 +49,34 @@ function handleLogin2(event){
 
 }
 
-function addToCart(item, price){
+function createMenu(menu){
+    let ulElement = document.getElementById("menu");
+    ulElement.style.listStyleType = 'none';
+    if(menu && menu.length > 0){
+        for (let i = 0; i < menu.length; i++) {
+            const liElement = document.createElement('li')
+            liElement.innerHTML = `
+            <div class="menu-item">
+            <span id="${menu[i].name}">${menu[i].name}</span>
+            <button onclick="addToCart('${menu[i].name}', '${menu[i].price}')">Add To Cart ($${menu[i].price.toFixed(2)})</button>
+
+            </div>
+         `;
+         ulElement.appendChild(liElement);
+        }
+    }
+
+}
+
+function addToCart(name, price){
+    console.log('item in addToCart', name, price)
+
+    price = parseFloat(price);
 
     // If the cart is empty, add the first item directly
     if(cart.length === 0){
         const objectToInsert = {
-            drink: item,
+            drink: name,
             cost: price,
             quantity: 1
         }
@@ -77,7 +91,7 @@ function addToCart(item, price){
         // check if item already exists in cart. if it is then increase the quantity and set the flag to true
         // you will notice 'break'.  this is a keyword in javascript.  it breaks out of the loop.  it is used here to break out as soon if the item is found since there is no need to keep going. unlike return, which would exit the entire function, break just exits the loop
         for (let index = 0; index < cart.length; index++) {
-            if(cart[index].drink === item){
+            if(cart[index].drink === name){
                 cart[index].quantity++
                 itemExists = true
                 break
@@ -87,7 +101,7 @@ function addToCart(item, price){
         // if there are items in the cart, but this item does not exist, add it to the cart
         if(!itemExists){
             const objectToInsert = {
-                drink: item,
+                drink: name,
                 cost: price,
                 quantity: 1
             }
@@ -105,7 +119,7 @@ function addToCart(item, price){
 function updateCart() {
 
     // reset totalCost
-    totalCost = 0;
+    let totalCost = 0;
 
     // get the element that we will be appending to
     let ulElement = document.getElementById("cart-items");
@@ -116,17 +130,18 @@ function updateCart() {
     ulElement.innerHTML = '';
 
     // loop through the cart to create the <li>s and append them. also we will calculate total cost.
+    console.log('cart', cart)
     for (let index = 0; index < cart.length; index++) {
 
         // calculate total cost based on cost and quantity of each item
-        totalCost += cart[index].cost * cart[index].quantity;
+        totalCost += cart[index].cost * cart[index].quantity
 
         // create <li> and fill it's innerHTML for each index of the cart array.  
         // we are also adding a button so we can remove items.
         const liElement = document.createElement('li')
         liElement.innerHTML = `
            Item: ${cart[index].drink}, Price: $${cart[index].cost.toFixed(2)}, Quantity: ${cart[index].quantity}
-            <button onclick="removeFromCart(${index})">Remove</button>
+            <button onclick="removeQuantity(${index})">-</button><button onclick="addQuantity(${index})">+</button><button onclick="removeFromCart(${index})">Remove</button>
         `;
         
         //append the li element
@@ -151,11 +166,22 @@ function removeFromCart(index) {
     updateCart();
 }
 
+function addQuantity(index) {
+    cart[index].quantity++;
+    updateCart()
+} 
+function removeQuantity(index) {
+    if (cart[index].quantity === 1) {
+        removeFromCart(index)
+    } else {
+    cart[index].quantity--
+    updateCart()
+    }
+} 
+
 // Function to handle checkout
 // this function just empties the cart.  this is where you would add a payment system. 
 // i did add a ternary operator on the alert.  
-
-
 
 // ${loggedInUser && loggedInUser.username ? loggedInUser.username : 'Human'} - this bit is saying 'if loggedInUser is exists AND loggedInUser.username exists then display the value of loggedInUser.username.  if loggedInUser doesnt exist OR loggedInUser.username doesnt exist the display Human.  so you can think of the ? as an if and the : as an else.  you can have very long and confusing ternary operators so in most cases an if/else block might be a better way to go...for now :)
 function checkout() {
@@ -163,20 +189,132 @@ function checkout() {
         alert('Your cart is empty!');
         return;
     }
-
-     // Get the total cost from the DOM
-   // let totalCost = parseFloat(document.getElementById('total').innerText);   // this was used before making variable totalCost Global
-
-    
-    let payment = prompt(`Please pay $${totalCost.toFixed(2)}`);  // prompt the user to pay the total amount (directly use totalCost)
-    while (parseFloat(payment).toFixed(2) !== totalCost.toFixed(2)) {
-        alert("Incorrect payment. Please enter the correct amount.");  // if payment doesn't match, show an error and ask again
-        payment = prompt(`Please pay $${totalCost.toFixed(2)}`);
-    }
-    
     alert(`Thank you for your purchase, ${loggedInUser && loggedInUser.username ? loggedInUser.username : 'Human'}!`);
     cart.length = 0;
     updateCart();
+}
+
+
+function hotOrCold(temp){
+    console.log('temp in hotOrCold', temp);
+    let somethingStupidElement = document.getElementById('somethingStupid');
+    let tempElement = document.createElement('div');
+    somethingStupidElement.appendChild(tempElement)
+    let coldItems = [];
+    let hotItems = [];
+    for (let index = 0; index < menu.length; index++) {
+        if(menu[index].type === 'cold' && menu[index].name != 'Pup Cup'){
+            
+            coldItems.push(menu[index])
+        }
+        else if(menu[index].type === 'hot'){
+            hotItems.push(menu[index])
+        }
+    }
+
+
+    console.log('hotItems', hotItems)
+    console.log('coldItems', coldItems)
+
+    if(temp >= 65){
+        let rando = Math.floor(Math.random() * coldItems.length)
+        console.log('rando', rando)
+        let coldItem = coldItems[rando];
+        console.log('coldItem', coldItem)
+        // suggest cold beverage
+        // tempElement.innerText = `Why dont you cool off with a ${coldItem}`;
+        // tempElement.innerHTML = `<div>why dont you cool off with a <a href="#${coldItem}">${coldItem}</a></div>`
+        tempElement.innerHTML = `<div onclick="addToCart('${coldItem.name}', '${coldItem.price}')">Why dont you try a ${coldItem.name}</div>`
+    }
+    else{
+        let rando = Math.floor(Math.random() * hotItems.length)
+        console.log('rando', rando)
+        let hotItem = hotItems[rando];
+        console.log('hotItem', hotItem)
+        // suggest hot beverage
+        // tempElement.innerText = `Why dont you cool off with a ${hotItems}`;
+        // tempElement.innerHTML = `<div>why dont you cool off with a <a href="#${hotItems}">${hotItems}</a></div>`
+        tempElement.innerHTML = `<div onclick="addToCart('${hotItem.name}', '${hotItem.price}')">Why dont you try a ${hotItem.name}</div>`
+    }
+}
+
+
+
+
+
+function getWeather(latitude, longitude){
+    console.log('getWeather')
+    console.log('lat', latitude)
+    console.log('lon', longitude)
+
+  const weatherURL = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=imperial&appid=5036614036843034e71c69350f7cab8a`;
+
+  fetch(weatherURL)
+    .then(response => {
+        console.log('response', response)
+        if(response.ok){
+            return response.json()
+        }
+    })
+    .then(data => {
+        console.log('data', data)
+      const temp = data.main.temp;
+      console.log('temp', temp)
+        hotOrCold(temp)
+    })
+    .catch(error => console.log('Error:', error));
+}
+
+
+function getUserLocation(){
+    console.log('getUserLocation')
+    if (navigator.geolocation) {
+        // Get the user's current position
+        navigator.geolocation.getCurrentPosition(function(position) {
+            console.log('position', position)
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+        
+            // Now that we have the coordinates, we can use them to fetch weather data
+            getWeather(latitude, longitude);
+        }, function(error) {
+            console.log("Error getting geolocation: " + error.message);
+        });
+    } else {
+    console.log("Geolocation is not supported by this browser.");
+    }
+}
+
+
+function practiceGetRoute(){
+    console.log('test test test')
+    const response = fetch('http://localhost:3000')
+    console.log('response', response)
+}
+
+
+async function getMenuFromServer(){    //add async with await to remove the promise error from the web page console
+    const response = await fetch('http://localhost:3000/getMenu')    //add await
+    console.log('response', response)
+    if (response.status !=200){
+        console.error('response error')
+        return;
+    }
+
+let data = await response.json();
+console.log('data', data);
+
+createMenu(data);
+
+
 
 
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+    //createMenu();
+    //getUserLocation();
+    getMenuFromServer()
+  });
+
+

@@ -16,7 +16,7 @@
             <button onclick="handleLogin()">Login</button>
             <span id="welcome-message"></span>
         </div> -->
-        <form id="login-form" onsubmit="handleLogin(event)">
+        <form id="login-form" onsubmit="handleLogin2(event)">
             <input type="text" id="username" placeholder="Username" required />
             <input type="password" id="password" placeholder="Password" required />
             <button type="submit">Login</button>
@@ -27,19 +27,9 @@
         <!-- Menu Section -->
         <section id="menu">
             <h2>Menu</h2>
-            <div class="menu-item">
-                <span>Americano</span>
-                <button onclick="addToCart('Americano', 2.5)">Add to Cart ($2.50)</button>
-            </div>
-            <div class="menu-item">
-                <span>Latte</span>
-                <button onclick="addToCart('Latte', 3.0)">Add to Cart ($3.00)</button>
-            </div>
-            <div class="menu-item">
-                <span>Cappuccino</span>
-                <button onclick="addToCart('Cappuccino', 3.5)">Add to Cart ($3.50)</button>
-            </div>
+            <ul id = "menu"></ul>
         </section>
+
         <!-- Cart Section -->
         <section id="cart">
             <h2>Shopping Cart</h2>
