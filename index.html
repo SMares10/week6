@@ -27,7 +27,7 @@
         <!-- Menu Section -->
         <section id="menu">
             <h2>Menu</h2>
-            <ul id = "menu"></ul>
+            <ul id = "menu-list"></ul>
         </section>
 
         <!-- Cart Section -->
@@ -37,6 +37,13 @@
             <p>Total: $<span id="total">0.00</span></p>
             <button onclick="checkout()">Checkout</button>
         </section>
+
+        <form id="contactForm">
+            <h2>Contact Form</h2>
+            <input type="text" id="name" placeholder="What is your Name"  required />
+            <input type="email" id="email" placeholder="What is your Email"  required />
+            <button type="submit">Submit Contact Info</button>
+        </form>
     </main>
     <script src="script.js"></script>
 </body>

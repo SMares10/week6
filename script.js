@@ -35,22 +35,23 @@ async function handleLogin2(event){
         })
     })
 
-    if(user.username !== username || user.password !== password){
-        alert(` is not found`)
-        return
-    }
-    else{
-       loggedInUser = user;
-       console.log('loggedInUser', loggedInUser)
-    }
+
+console.log('response', response)
+
+if(!response.ok){
+    alert('invalid credentials')
+}
+
+let responseJson = await response.json()
+console.log ('responseJson', responseJson)
 
     let welcomeMessageElement = document.getElementById('welcome-message');
-    welcomeMessageElement.innerText = `Welcome ${loggedInUser.username}`
+    welcomeMessageElement.innerText = `Welcome ${username}`
 
 }
 
 function createMenu(menu){
-    let ulElement = document.getElementById("menu");
+    let ulElement = document.getElementById("menu-list");
     ulElement.style.listStyleType = 'none';
     if(menu && menu.length > 0){
         for (let i = 0; i < menu.length; i++) {
@@ -184,15 +185,39 @@ function removeQuantity(index) {
 // i did add a ternary operator on the alert.  
 
 // ${loggedInUser && loggedInUser.username ? loggedInUser.username : 'Human'} - this bit is saying 'if loggedInUser is exists AND loggedInUser.username exists then display the value of loggedInUser.username.  if loggedInUser doesnt exist OR loggedInUser.username doesnt exist the display Human.  so you can think of the ? as an if and the : as an else.  you can have very long and confusing ternary operators so in most cases an if/else block might be a better way to go...for now :)
-function checkout() {
+async function checkout() {
     if (cart.length === 0) {
         alert('Your cart is empty!');
         return;
     }
+
+    console.log('cart in checkout', cart);
+
+    const response = await fetch('http://localhost:3000/checkout',
+        {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json' //tell the server...
+        },
+        body: JSON.stringify(cart)
+        })
+
+        let responseJson = await response.json();
+
+        console.log('responseJson', responseJson);
+
+        if(!response.ok){
+            alert(responseJson.message)
+        }
+
+        alert(`${responseJson.message}. confirmation Number: ${responseJson.confirmationNumber}`)
+
     alert(`Thank you for your purchase, ${loggedInUser && loggedInUser.username ? loggedInUser.username : 'Human'}!`);
     cart.length = 0;
     updateCart();
 }
+
+
 
 
 function hotOrCold(temp){
@@ -306,15 +331,44 @@ console.log('data', data);
 
 createMenu(data);
 
+};
 
+//CONTACT FORM START
 
+// Wait for the form to submit
+document.getElementById('contactForm').addEventListener('submit', async function(event) {
+    event.preventDefault(); // Stop the form from refreshing the page
 
-}
+    // Get form values
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+
+    // Check if fields are filled
+    if (!name || !email) {
+        alert('Please fill in all fields');
+        return;
+    }
+
+    // Create a contact object
+    const contact = { name, email };
+
+    console.log('contact information', contact);
+
+    // Send to server
+    const response = await fetch('http://localhost:3000/contactForm', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(contact)
+    });
+
+    const responseJson = await response.json();
+    console.log('responseJson', responseJson);
+});
+
+//end form section
 
 document.addEventListener("DOMContentLoaded", function() {
-    //createMenu();
-    //getUserLocation();
-    getMenuFromServer()
-  });
-
-
+    getMenuFromServer();
+});
