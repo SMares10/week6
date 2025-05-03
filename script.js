@@ -337,21 +337,25 @@ createMenu(data);
 //SECTION FOR CONTACT FORM STARTS HERE----------------------------------------------
 
 // Wait for the form to submit
-document.getElementById('contactForm').addEventListener('submit', async function(event) {
+
+async function contactForm(event){   
+
+
     event.preventDefault(); // Stop the form from refreshing the page
 
     // Get form values
-    const name = document.getElementById('name').value;
+    const firstName = document.getElementById('firstName').value;
+    const lastName = document.getElementById('lastName').value;
     const email = document.getElementById('email').value;
+    const comment = document.getElementById('comment').value;
 
     // Check if fields are filled
-    if (!name || !email) {
-        alert('Please fill in all fields');
-        return; //if alert is triggered it exits the fucntion event listener and nothing below is run anymore
+    if (!firstName || !lastName || !email || !comment) {
+        return alert('Please fill in all fields'); //if alert is triggered it exits the fucntion event listener and nothing below is run anymore
     }
 
     // Create a contact object
-    const contact = { name, email };
+    const contact = { firstName, lastName, email, comment };
 
     console.log('const contact = contact information entered confirmed', contact);
 
@@ -366,7 +370,9 @@ document.getElementById('contactForm').addEventListener('submit', async function
 
     const responseJson = await response.json();
     console.log('responseJson', responseJson);
-});
+    document.getElementById('messageReceived').textContent = "Message Received, Thank you."; //this adds a text comment that it submitted
+    alert("Message Received"); //this option gives a pop up that it got received
+};
 
 //END CONTACT FORM SECTION HERE ---------------------------------------
 

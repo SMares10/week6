@@ -12,14 +12,7 @@ app.use(express.urlencoded({ extended: true })); // for parsing application/x-ww
 
 
 //cart
-const menu = [
-    {name: 'Americano', price: 2.5, type: 'hot',},
-    {name: 'Latte', price: 3.0, type: 'hot'},
-    {name: 'Cappuccino', price: 3.5, type: 'hot'},
-    {name: 'Frozen Americano', price: 4.5, type: 'cold'},
-    {name: 'Frozen Latte', price: 2.5, type: 'cold'},
-    {name: 'Pup Cup', price: 0, type: 'cold'},
-];
+
 
 
 app.get('/', (req, res) => {
@@ -27,9 +20,15 @@ app.get('/', (req, res) => {
   res.send('Hello World')
 })
 
-app.get('/getMenu', (req, res) => {
-    console.log('gn2 /getMenu')
-    //reach out to the db to get the menu
+app.get('/getMenu', async (req, res) => {
+    const { data: menu, error} = await supabase
+    .from('menu')
+    .select()
+
+    if (error) {
+        console.error('error', error);
+        return res.status(500).json({ error: error.message });
+        }
     res.json(menu)
 })
 
@@ -75,7 +74,7 @@ app.post('/checkout', (req, res) => {
 //contact form section-----------------------------------------------------------------
 const contactFormArray = [];
 
-app.post('/contactForm', (req, res) => {
+app.post('/contactForm', async (req, res) => {
     console.log('gn2 /contactForm', req.body);
 
     // Check if the body has keys
@@ -83,15 +82,22 @@ app.post('/contactForm', (req, res) => {
         return res.status(400).json({ message: "Please Add Contact Information" });
     }
 
-    const { name, email } = req.body;
-    console.log('name:', name);
-    console.log('email:', email);
+    const { firstName, lastName, email, comment } = req.body;
+ 
 
-    const contactForm = { name, email };
-    contactFormArray.push(contactForm);
-    console.log('contactForm:', contactForm);
 
-    res.status(200).json({ message: "Contact Info Submitted" });
+    const {data, error} = await supabase
+    .from ('contact_form_messages')
+    .insert([
+        {
+            first_name: firstName,
+            last_name: lastName,
+            email: email,
+            comment: comment,
+        }
+    ])
+    res.status(200).json({message: "Message Received Successfully"})
+
 });
 //contact form ends-------------------------------------------------------------------------
 

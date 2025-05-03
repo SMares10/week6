@@ -38,11 +38,14 @@
             <button onclick="checkout()">Checkout</button>
         </section>
 
-        <form id="contactForm">
+        <form onsubmit="contactForm(event)">
             <h2>Contact Form</h2>
-            <input type="text" id="name" placeholder="What is your Name"  required />
+            <input type="text" id="firstName" placeholder="What is your First Name"  required />
+            <input type="text" id="lastName" placeholder="What is your Last Name"  required />
             <input type="email" id="email" placeholder="What is your Email"  required />
+            <textarea id="comment"></textarea>
             <button type="submit">Submit Contact Info</button>
+            <p id="messageReceived"></p>
         </form>
     </main>
     <script src="script.js"></script>
