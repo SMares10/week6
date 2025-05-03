@@ -32,7 +32,7 @@ app.get('/getMenu', (req, res) => {
     res.json(menu)
 })
 
-//user & password
+//user & password-----------------------------------------------------------
 const user = { username: 'steve', password: '123' };
 
 app.post('/login', (req, res) => {
@@ -77,7 +77,7 @@ app.post('/checkout', (req, res) => {
 
 })
 
-//contact form section
+//contact form section-----------------------------------------------------------------
 const contactFormArray = [];
 
 app.post('/contactForm', (req, res) => {
@@ -98,7 +98,7 @@ app.post('/contactForm', (req, res) => {
 
     res.status(200).json({ message: "Contact Info Submitted" });
 });
-//contact form ends
+//contact form ends-------------------------------------------------------------------------
 
 
 app.listen(3000, () => {

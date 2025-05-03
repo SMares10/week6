@@ -4,7 +4,7 @@
 // Cart data
 const cart = [];
 
-// Store logged in user
+// Store logged in user--------------------------------------------
 let loggedInUser = null;
 
 
@@ -49,6 +49,9 @@ console.log ('responseJson', responseJson)
     welcomeMessageElement.innerText = `Welcome ${username}`
 
 }
+//ends log in user ------------------------------------------------------------------
+
+
 
 function createMenu(menu){
     let ulElement = document.getElementById("menu-list");
@@ -333,7 +336,7 @@ createMenu(data);
 
 };
 
-//CONTACT FORM START
+//SECTION FOR CONTACT FORM STARTS HERE----------------------------------------------
 
 // Wait for the form to submit
 document.getElementById('contactForm').addEventListener('submit', async function(event) {
@@ -346,13 +349,13 @@ document.getElementById('contactForm').addEventListener('submit', async function
     // Check if fields are filled
     if (!name || !email) {
         alert('Please fill in all fields');
-        return;
+        return; //if alert is triggered it exits the fucntion event listener and nothing below is run anymore
     }
 
     // Create a contact object
     const contact = { name, email };
 
-    console.log('contact information', contact);
+    console.log('const contact = contact information entered confirmed', contact);
 
     // Send to server
     const response = await fetch('http://localhost:3000/contactForm', {
@@ -367,7 +370,7 @@ document.getElementById('contactForm').addEventListener('submit', async function
     console.log('responseJson', responseJson);
 });
 
-//end form section
+//END CONTACT FORM SECTION HERE ---------------------------------------
 
 document.addEventListener("DOMContentLoaded", function() {
     getMenuFromServer();
