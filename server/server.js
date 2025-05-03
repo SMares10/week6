@@ -1,5 +1,6 @@
 const express = require('express')
-
+require('dotenv').config(); //added for supabase
+const supabase = require('./db') //added for supabase
 const app = express()
 const cors = require('cors')
 
@@ -33,26 +34,20 @@ app.get('/getMenu', (req, res) => {
 })
 
 //user & password-----------------------------------------------------------
-const user = { username: 'steve', password: '123' };
-
-app.post('/login', (req, res) => {
+app.post('/login', async (req, res) => {
     console.log('gn2 /login', req.body)
-    //check user log in
-    //res.json(menu)
-
-const {password, username} = req.body;
-
-//check user log in
-
-console.log ('username', username);
-console.log ('password', password);
-
-if(username != user.username || password != user.password){
-    res.status(401).json({message: "Not Authorized"});
-}
-
-    res.status(200).json({message: 'Success', menu: menu})
-
+    const { username, password } = req.body;
+    console.log('username', username)
+    console.log('password', password)
+    const { data, error } = await supabase.auth.signInWithPassword({
+        email: username,
+        password: password
+    });
+    if (error) {
+        console.error('Signin error', error);
+        return res.status(401).json({ error: error.message });
+    }
+    res.status(200).json({message: 'Success'})
 })
 
 const orderArray = [];
@@ -61,7 +56,7 @@ app.post('/checkout', (req, res) => {
     console.log('gn2 /checkout', req.body)
 
     if(!req.body || req.body.length < 1){
-        res.status(40).json({message: "At least one item required for order"})
+        res.status(400).json({message: "At least one item required for order"})
     }
 
 

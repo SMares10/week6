@@ -19,9 +19,7 @@ async function handleLogin2(event){
     const password = passwordElement.value;
     console.log('password', password)
 
-
    // not needed anymore:  console.log('user.username', user.username)
-
 
     const response = await fetch('http://localhost:3000/login',
     {
